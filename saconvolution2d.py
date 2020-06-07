@@ -23,6 +23,7 @@ class SAConvolution2D(tf.keras.layers.Layer): # Spatially Aware Convolution Laye
         self.x = tf.linspace(-1.0, 1.0, num=input_shape[-3])[:,np.newaxis,np.newaxis]*tf.ones(input_shape[-3:-1]+(1,))
         self.y = tf.linspace(-1.0, 1.0, num=input_shape[-2])[np.newaxis,:,np.newaxis]*tf.ones(input_shape[-3:-1]+(1,))
         kwargs['input_shape'] = input_shape[-3:-1] + (input_shape[-1] + 2,)
+        kwargs['name'] = '{}/convolute2d'.format(self.name)
         self.layers = [
                         tf.keras.layers.Concatenate(input_shape=input_shape[-3:-1]+(None,), name = '{}/concatenate'.format(self.name)),
                         tf.keras.layers.Conv2D(self.filters, self.kernel_size,  *args, **kwargs)
