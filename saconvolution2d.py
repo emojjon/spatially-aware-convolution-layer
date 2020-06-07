@@ -30,5 +30,5 @@ class SAConvolution2D(tf.keras.layers.Layer): # Spatially Aware Convolution Laye
                       ]
 
     def call(self, inputs):
-        return self.layers[1](self.layers[0]([inputs, self.x[None,:,:,:], self.y[None,:,:,:]]))
+        return self.layers[1](self.layers[0]([inputs, tf.ones_like(inputs[:,:,:,0:1])*self.x, tf.ones_like(inputs[:,:,:,0:1])*self.y]))
 
