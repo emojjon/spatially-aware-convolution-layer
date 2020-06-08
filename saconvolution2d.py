@@ -18,10 +18,18 @@ class SAConvolution2D(tf.keras.layers.Layer): # Spatially Aware Convolution Laye
         if 'input_shape' in kwargs:
             input_shape = kwargs.pop('input_shape')
             self.build(input_shape, *args, **kwargs)
+        else:
+            self.args=args
+            self.kwargs=kwargs
 
     def build(self, input_shape, *args, **kwargs):
         self.x = tf.linspace(-1.0, 1.0, num=input_shape[-3])[:,np.newaxis,np.newaxis]*tf.ones(input_shape[-3:-1]+(1,))
         self.y = tf.linspace(-1.0, 1.0, num=input_shape[-2])[np.newaxis,:,np.newaxis]*tf.ones(input_shape[-3:-1]+(1,))
+        if 'kwargs' in dir(self):
+            kwargs = {**self.kwargs, **kwargs}
+        if 'args' in dir(self):
+            if len(self.args) > len(args):
+                args += self.args[len(args):]        
         kwargs['input_shape'] = input_shape[-3:-1] + (input_shape[-1] + 2,)
         kwargs['name'] = '{}/convolute2d'.format(self.name)
         self.layers = [
