@@ -29,8 +29,11 @@ class SAConvolution2D(tf.keras.layers.Layer): # Spatially Aware Convolution Laye
             kwargs = {**self.kwargs, **kwargs}
         if 'args' in dir(self):
             if len(self.args) > len(args):
-                args += self.args[len(args):]        
-        kwargs['input_shape'] = input_shape[-3:-1] + (input_shape[-1] + 2,)
+                args += self.args[len(args):]
+        self.kwargs = kwargs # Save for postarity
+        self.args = args
+
+        kwargs['input_shape'] = input_shape[-3:-1] + (input_shape[-1] + 2,) # Only meant for Conv2D below
         kwargs['name'] = '{}/convolute2d'.format(self.name)
         self.layers = [
                         tf.keras.layers.Concatenate(input_shape=input_shape[-3:-1]+(None,), name = '{}/concatenate'.format(self.name)),
@@ -40,3 +43,16 @@ class SAConvolution2D(tf.keras.layers.Layer): # Spatially Aware Convolution Laye
     def call(self, inputs):
         return self.layers[1](self.layers[0]([inputs, tf.ones_like(inputs[:,:,:,0:1])*self.x, tf.ones_like(inputs[:,:,:,0:1])*self.y]))
 
+    def get_config(self):
+        config = {**self.kwargs} # make a new copy
+        config['filters'] = self.filters
+        config['kernel_size'] = self.kernel_size
+        config['args'] = self.args
+        return config
+    
+    @classmethod
+    def from_config(cls, config):
+        filters = config.pop('filters')
+        kernel_size = config.pop('kernel_size')
+        args = config.pop('args')
+        return cls(filters, kernel_size, *args, **config)
